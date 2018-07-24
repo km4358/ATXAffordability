@@ -2,7 +2,7 @@
 
 
 //set map variable and view
-var mymap = L.map('map').setView([30.268009, -97.771204], 16);
+var mymap = L.map('map').setView([30.275, -97.741], 12);
 //set tile layer source and attributes
 var tileLayer = L.tileLayer('https://api.mapbox.com/styles/v1/kmcalister/cjdrsckx62ok42spck7uq21t5/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia21jYWxpc3RlciIsImEiOiJjaXNkbW9lM20wMDZ1Mm52b3p3cDJ0NjE0In0.KyQ5znmrXLsxaPk6y-fn0A', {
     attribution: 'Site Design © Kerry C. McAlister, 2018; Imagery: <a href="mapbox://styles/kmcalister/cjdrsckx62ok42spck7uq21t5">Mapbox</a>'
@@ -14,33 +14,31 @@ $(document).click(function () {
 });
 
 //set global vars for sql queries and login
-var sqlBase = "SELECT * FROM park_boundary";
-var sqlTrail = "SELECT * FROM urban_trails";
-var sqlFeedback = "SELECT * FROM feedback";
+var sqlUndev = "SELECT * FROM undeveloped_land";
+var sqlKirwan = "SELECT * FROM kirwan";
+var sqlHouse = "SELECT * FROM affordable_housing";
 
 //set vars for park sites
-var sqlSites = "SELECT * FROM park_sites";
-var sqlEnt = "SELECT * FROM park_sites WHERE ent='Y'";
-var sqlRec = "SELECT * FROM park_sites WHERE rec='Y'";
-var sqlExh = "SELECT * FROM park_sites WHERE exh='Y'";
-var sqlFam = "SELECT * FROM park_sites WHERE fam='Y'";
-var sqlDog = "SELECT * FROM park_sites WHERE dog='Y'";
+var sqlCensus = "SELECT * FROM census_tract";
+var sqlWhi = "SELECT * FROM census_tract WHERE sum_white='Y'";
+var sqlBla = "SELECT * FROM census_tract WHERE sum_black='Y'";
+var sqlHis = "SELECT * FROM census_tract WHERE sum_hispan='Y'";
+var sqlAsi = "SELECT * FROM census_tract WHERE sum_asian='Y'";
+var sqlOth = "SELECT * FROM census_tract WHERE sum_other='Y'";
+var sqlMul = "SELECT * FROM census_tract WHERE sum_multi='Y'";
 
 //cartodb username
 var cartoUser = "kmcalister";
 
 //set empty global vars 
-var parkBoundary = null;
-var parkTrails = null;
-var parkSites = null;
+var censusTracts = null;
+var undeveloped = null;
+var kirwan = null;
+var housing = null;
 
 //set location var 
 var myLocation = null;
 var locationMarker = null;
-
-//set blank marker var
-var siteMarker = null;
-var feedbackPoints = null;
 
 //user location icon
 var locateIcon = L.icon({
@@ -49,111 +47,81 @@ var locateIcon = L.icon({
 });
 
 //set styles for boundary and trails
-var boundaryStyle = {
+var censusStyle = {
     "color": "#dc42f4",
     "weight": 5,
     "opacity": 0.65
 };
 
-var trailStyle = {
-    "color": "#086b34",
-    "weight": 10,
-    "opacity": 0.75
-    
-}
-
 //turn on location control
 L.control.locate({ icon: 'fa fa-location-arrow' }).addTo(mymap);
 
-//create function to begin drawing edits
-function startEdit(){
-    if(controlOnMap == true){
-        mymap.removeControl(drawControl);
-        controlOnMap = false;
-    }
-    mymap.addControl(drawControl);
-    controlOnMap = true;
-};
 
-//function to turn off draw control
-function stopEdit(){
-    mymap.removeControl(drawControl);
-    controlOnMap = false;
-};
-
-//add drawn items to map after feedback submitted
-mymap.on('draw:created', function(e) {
-    var layer = e.layer;
-    drawnItems.addLayer(layer);
-    mymap.addLayer(drawnItems);
-    dialog.dialog("open");
-});
-
-//turn on dialog box after drawing 
-var dialog = $("#dialog").dialog({
-    autoOpen: false,
-    height: 300,
-    width: 350,
-    modal: true,
-    position: {
-        my: "center center",
-        at: "center center",
-        of: "#map"
-    },
-    buttons: {
-        "Submit Feedback": setData,
-        Cancel: function() {
-            dialog.dialog("close");
-            mymap.removeLayer(drawnItems);
-        }
-    },
-    close: function() {
-        form[ 0 ].reset();
-        console.log("Dialog closed");
-    }
-});
-
-var form = dialog.find("form").on("submit", function(event) {
-    event.preventDefault();
-});
-
-
-//function to load park boundary from geojson
-function showBoundary() {
-    if (mymap.hasLayer(parkBoundary)) {
-        mymap.removeLayer(parkBoundary);
+//function to load census tracts from geojson
+function showCensus() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
     };
 
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlBase, function (data) {
-        parkBoundary = L.geoJson(data, {
-            style: boundaryStyle,
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusStyle,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.park_name + '</b><br /><em>' + feature.properties.park_acres + ' acres' + '</em></p>');
+                layer.bindPopup('<p><b>' + feature.properties.tractce10 + '</b><br /><em>' + 'Total Population: ' + feature.properties.sum_totpop + '</em></p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
     });
 };
 
-//load trails from geojson
-function showTrails() {
-    if (mymap.hasLayer(parkTrails)) {
-        mymap.removeLayer(parkTrails);
+//load undeveloped land from geojson
+function showUndev() {
+    if (mymap.hasLayer(undeveloped)) {
+        mymap.removeLayer(undeveloped);
     };
 
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlTrail, function (data) {
-        parkTrails = L.geoJson(data, {
-            style: trailStyle,
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlUndev, function (data) {
+        undeveloped = L.geoJson(data, {
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.length_mil + ' mi.' + '</em></p>');
+                layer.bindPopup('<p><b>' + feature.properties.parcel_id_ + '</b></p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
     });
 };
 
-//load park sites from geojson
-function showSites() {
+function showKir() {
+    if (mymap.hasLayer(kirwan)) {
+        mymap.removeLayer(kirwan);
+    };
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlKirwan, function (data) {
+        kirwan = L.geoJson(data, {
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<p><b>' + feature.properties.comopp + '</b></p>');
+                layer.cartdodb_id = feature.properties.cartdodb_id;
+            }
+        }).addTo(mymap);
+    });
+};
+
+function showHouse() {
+    if (mymap.hasLayer(housing)) {
+        mymap.removeLayer(housing);
+    };
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlHouse, function (data) {
+        housing = L.geoJson(data, {
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<p><b>' + feature.properties.project_name + '</b></p>');
+                layer.cartdodb_id = feature.properties.cartdodb_id;
+            }
+        }).addTo(mymap);
+    });
+};
+
+//load kirwan polys from geojson
+/*function showSites() {
     if (mymap.hasLayer(parkSites)||mymap.hasLayer(locationMarker)){
         mymap.removeLayer(parkSites);
         mymap.removeLayer(locationMarker);
@@ -174,10 +142,10 @@ function showSites() {
             }
         }).addTo(mymap);
     });
-};
+};*/
 
 //load feedback points from geojson
-function showFeedback() {
+/*function showFeedback() {
     if (mymap.hasLayer(feedbackPoints)) {
         mymap.removeLayer(feedbackPoints);
     };
@@ -296,7 +264,7 @@ function filterDog() {
             }
         }).addTo(mymap)
     });
-};
+};*/
 
 //create function for location based filtering
 function locationFound(e){
@@ -313,7 +281,7 @@ function locationError(e){
 mymap.on('click', locationFound);
 
 //function utilizing location to filter nearest sites
-function closestSite(){
+/*function closestSite(){
     var sqlClosest = "SELECT * FROM park_sites ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint("+myLocation.lng+","+myLocation.lat+"), 4326) LIMIT 3";
     
     if (mymap.hasLayer(parkSites)){
@@ -334,35 +302,45 @@ function closestSite(){
 
     });
 
-};
+};*/
 
 //event listeners
-//checkbox event listener for park boundary
-$('input[value=boundary').change(function () {
+//checkbox event listener for census tracts
+$('input[value=census').change(function () {
     if (this.checked) {
-        showBoundary();
+        showCensus();
     } else {
-        mymap.removeLayer(parkBoundary)
+        mymap.removeLayer(censusTracts)
     };
 });
 
-//listener for trails
-$('input[value=trails').change(function () {
+//listener for land
+$('input[value=undev').change(function () {
     if (this.checked) {
-        showTrails();
+        showUndev();
     } else {
-        mymap.removeLayer(parkTrails)
+        mymap.removeLayer(undeveloped)
     };
 });
 
-//listener for feedback
-$('input[value=feedback').change(function () {
+//listener for kirwan
+$('input[value=kirwan').change(function () {
     if (this.checked) {
-        showFeedback();
+        showKir();
     } else {
-        mymap.removeLayer(feedbackPoints)
+        mymap.removeLayer(kirwan)
     };
 });
+
+//listener for housing
+$('input[value=housing').change(function () {
+    if (this.checked) {
+        showHouse();
+    } else {
+        mymap.removeLayer(housing)
+    };
+});
+///////////////////////////////////////////////////////////////////////
 
 //listeners for point layers
 $('input[value=ent]').click(function () {
@@ -384,83 +362,6 @@ $('input[value=all]').click(function () {
     showSites();
 });
 
-//add draw controls
-var drawControl = new L.Control.Draw({
-    draw : {
-      polygon : false,
-      polyline : false,
-      rectangle : false,
-      circle : false
-    },
-    edit : false,
-    remove: false
-  });
-  
-  // Boolean global variable used to control visiblity
-  var controlOnMap = false;
-  
-  // Create variable for Leaflet.draw features
-  var drawnItems = new L.FeatureGroup();
-
-  mymap.on('draw:created', function(e) {
-    var layer = e.layer;
-    drawnItems.addLayer(layer);
-    mymap.addLayer(drawnItems);
-    dialog.dialog("open");
-});
-
-//create dialog box and submit actions
-var dialog = $("#dialog").dialog({
-    autoOpen: false,
-    height: 300,
-    width: 350,
-    modal: true,
-    position: {
-        my: "center center",
-        at: "center center",
-        of: "#map"
-    },
-    buttons: {
-        "Submit Feedback": setData,
-        Cancel: function() {
-            dialog.dialog("close");
-            mymap.removeLayer(drawnItems);
-        }
-    },
-    close: function() {
-        form[ 0 ].reset();
-        console.log("Dialog closed");
-    }
-});
-
-var form = dialog.find("form").on("submit", function(event) {
-    event.preventDefault();
-});
-
-//set parameters and credentials for direct posting to carto database
-function setData() {
-    var enteredUsername = username.value;
-    var enteredEmail = email.value;
-    var enteredFeedback = feedbackEntry.value;
-    drawnItems.eachLayer(function (layer) {
-        var a = layer.getLatLng();
-        var postSQL = "INSERT INTO feedback (the_geom, name, feedback, email, latitude, longitude) values (ST_GeomFromText('POINT(" + a.lng + " " + a.lat + ")',4326)," +"'"+ enteredUsername +"'"+ "," +"'"+ enteredFeedback +"'"+"," +"'"+ enteredEmail+"'" + "," +"'"+ a.lat +"'"+ "," +"'"+ a.lng +"')";
-        //var a = layer.getLatLng();
-        //var postSQL2 = "{'type':'Point', 'coordinates':[" + a.lng + "," + a.lat + "]}'),4326)," +"'"+ enteredUsername +"'"+ "," +"'"+ enteredFeedback +"'"+"," +"'"+ enteredEmail+"'" + "," +"'"+ a.lat +"'"+ "," +"'"+ a.lng +"'"+ ")";
-        //console.log(postSQL2);
-        console.log(postSQL)
-        var pURL = postSQL; //+ postSQL2;
-        console.log(pURL);
-        postUrl = "https://kmcalister.carto.com/api/v2/sql?q=" + pURL + "&api_key=8AlwQsbc6N3ZHhAL5JNqxg";
-        $.post(postUrl)
-    });
-    mymap.removeLayer(drawnItems);
-    drawnItems = new L.FeatureGroup();
-    console.log("drawnItems has been cleared");
-    dialog.dialog("close");
-};
-
 //create map and load all park sites
 $(document).ready(function () {
-    showSites()
 });
