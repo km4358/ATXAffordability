@@ -15,26 +15,20 @@ $(document).click(function () {
 
 //set global vars for sql queries and login
 var sqlUndev = "SELECT * FROM undeveloped_land";
+var sqlValues = "SELECT * FROM housing_tracts";
 var sqlKirwan = "SELECT * FROM kirwan";
-var sqlHouse = "SELECT * FROM affordable_housing";
-
-//set vars for park sites
-var sqlCensus = "SELECT * FROM census_tract";
-var sqlWhi = "SELECT * FROM census_tract WHERE sum_white='Y'";
-var sqlBla = "SELECT * FROM census_tract WHERE sum_black='Y'";
-var sqlHis = "SELECT * FROM census_tract WHERE sum_hispan='Y'";
-var sqlAsi = "SELECT * FROM census_tract WHERE sum_asian='Y'";
-var sqlOth = "SELECT * FROM census_tract WHERE sum_other='Y'";
-var sqlMul = "SELECT * FROM census_tract WHERE sum_multi='Y'";
+var sqlHouseSites = "SELECT * FROM affordable_housing";
+var sqlCensus = "SELECT * FROM race_tracts";
 
 //cartodb username
 var cartoUser = "kmcalister";
 
 //set empty global vars 
 var censusTracts = null;
+var homeValues = null;
 var undeveloped = null;
 var kirwan = null;
-var housing = null;
+var housingSites = null;
 
 //set location var 
 var myLocation = null;
@@ -49,8 +43,122 @@ var locateIcon = L.icon({
 //set styles for boundary and trails
 var censusStyle = {
     "color": "#dc42f4",
-    "weight": 5,
-    "opacity": 0.65
+    "weight": 2,
+    "opacity": 0.75
+};
+
+var landStyle = {
+    fillColor: "#17c4a1",
+    color: "#515151",
+    "weight": 1,
+    "opacity": 0.75
+};
+
+function getOppColor(d){
+    return d == 'Very High' ? '#003813' :
+    d == 'High'  ? '#00822c' :
+    d == 'Moderate'  ? '#97ef00' :
+    d == 'Low'  ? '#ef8b00' :
+    d == 'Very Low'  ? '#ef0000':
+    '#FFEDA0';
+
+};
+
+function getValColor(d){
+    return d > 1000000 ? '#003813' :
+    d > 500000  ? '#00822c' :
+    d > 250000  ? '#97ef00' :
+    d > 100000  ? '#ef8b00' :
+    d > 50000  ? '#ef0000':
+    '#FFEDA0';
+
+};
+
+function oppStyle(feature) {
+    return{
+        fillColor: getOppColor(feature.properties.comopp),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+};
+
+function valStyle(feature) {
+    return{
+        fillColor: getValColor(feature.properties.median_val),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+};
+
+function getCensusColor(d){
+    return d > 75  ? '#BD0026' :
+           d > 50  ? '#E31A1C' :
+           d > 25   ? '#FD8D3C' :
+           d > 1   ? '#FED976' :
+                      '#FFEDA0';
+
+};
+
+function censusRaceStyleWhite(feature) {
+    return{
+        fillColor: getCensusColor(feature.properties.white_per),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+
+};
+
+function censusRaceStyleBlack(feature) {
+    return{
+        fillColor: getCensusColor(feature.properties.black_per),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+
+};
+
+function censusRaceStyleHisp(feature) {
+    return{
+        fillColor: getCensusColor(feature.properties.hisp_per),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+
+};
+
+function censusRaceStyleAsian(feature) {
+    return{
+        fillColor: getCensusColor(feature.properties.asian_per),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+
+};
+
+function censusRaceStyleOther(feature) {
+    return{
+        fillColor: getCensusColor(feature.properties.other_per),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+
+};
+
+function censusRaceStyleMulti(feature) {
+    return{
+        fillColor: getCensusColor(feature.properties.multi_per),
+        color: '#8c8a8a',
+        "weight": 1,
+        "opacity": 0.5
+    };
+
 };
 
 //turn on location control
@@ -67,7 +175,7 @@ function showCensus() {
         censusTracts = L.geoJson(data, {
             style: censusStyle,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.tractce10 + '</b><br /><em>' + 'Total Population: ' + feature.properties.sum_totpop + '</em></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Total Population: ' + '</b>' + feature.properties.sum_totpop + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
@@ -82,8 +190,9 @@ function showUndev() {
 
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlUndev, function (data) {
         undeveloped = L.geoJson(data, {
+            style: landStyle,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.parcel_id_ + '</b></p>');
+                layer.bindPopup('<p><b>' + 'Parcel ID: ' + '</b>' + feature.properties.parcel_id_ + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
@@ -97,8 +206,25 @@ function showKir() {
 
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlKirwan, function (data) {
         kirwan = L.geoJson(data, {
+            style: oppStyle,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.comopp + '</b></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: ' + '</b>' + feature.properties.tract10 + '</br><b>' + 'Opportunity Score: ' + '</b>' + feature.properties.comopp + '</p>');
+                layer.cartdodb_id = feature.properties.cartdodb_id;
+            }
+        }).addTo(mymap);
+    });
+};
+
+function showHomeVal() {
+    if (mymap.hasLayer(homeValues)) {
+        mymap.removeLayer(homeValues);
+    };
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlValues, function (data) {
+        kirwan = L.geoJson(data, {
+            style: valStyle,
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<p><b>' + 'Census Tract ID: ' + '</b>' + feature.properties.tractce10 + '</br><b>' + 'Median Home Value: $' + '</b>' + feature.properties.median_val + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
@@ -106,12 +232,12 @@ function showKir() {
 };
 
 function showHouse() {
-    if (mymap.hasLayer(housing)) {
-        mymap.removeLayer(housing);
+    if (mymap.hasLayer(housingSites)) {
+        mymap.removeLayer(housingSites);
     };
 
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlHouse, function (data) {
-        housing = L.geoJson(data, {
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlHouseSites, function (data) {
+        housingSites = L.geoJson(data, {
             onEachFeature: function (feature, layer) {
                 layer.bindPopup('<p><b>' + feature.properties.project_name + '</b></p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
@@ -120,158 +246,111 @@ function showHouse() {
     });
 };
 
-//load kirwan polys from geojson
-/*function showSites() {
-    if (mymap.hasLayer(parkSites)||mymap.hasLayer(locationMarker)){
-        mymap.removeLayer(parkSites);
-        mymap.removeLayer(locationMarker);
-    };
-
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlSites, function (data) {
-        parkSites = L.geoJson(data, {
-            onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.url + '</em></p>');
-                layer.cartdodb_id = feature.properties.cartdodb_id;
-                var siteMarker = new L.Icon({
-                    iconSize: [50, 50],
-                    iconUrl: "img/star.png",
-                    riseOnHover: true,
-                    shadowSize: [80, 50]
-                });
-                layer.setIcon(siteMarker);
-            }
-        }).addTo(mymap);
-    });
-};*/
-
-//load feedback points from geojson
-/*function showFeedback() {
-    if (mymap.hasLayer(feedbackPoints)) {
-        mymap.removeLayer(feedbackPoints);
-    };
-
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlFeedback, function (data) {
-        feedbackPoints = L.geoJson(data, {
-            onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + 'Feedback: ' + feature.properties.feedback + '</em></p>');
-                layer.cartdodb_id = feature.properties.cartdodb_id;
-            }
-        }).addTo(mymap);
-    });
-};
 
 //filter entertainment sites
-function filterEnt() {
-    if (mymap.hasLayer(parkSites)) {
-        mymap.removeLayer(parkSites);
+function filterWhite() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
     };
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlEnt, function (data) {
-        parkSites = L.geoJson(data, {
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusRaceStyleWhite,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.type + '</em></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Percent White: ' + '</b>' + feature.properties.white_per + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
-                var entMarker = new L.Icon({
-                    iconSize: [50, 50],
-                    iconUrl: "img/Music-icon.png",
-                    riseOnHover: true,
-                    shadowSize: [100, 100]
-                });
-                layer.setIcon(entMarker);
             }
-        }).addTo(mymap)
+        }).addTo(mymap);
     });
 };
 
-//filter exhibitions
-function filterExh() {
-    if (mymap.hasLayer(parkSites)) {
-        mymap.removeLayer(parkSites);
+function filterBlack() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
     };
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlExh, function (data) {
-        parkSites = L.geoJson(data, {
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusRaceStyleBlack,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.type + '</em></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Percent Black: ' + '</b>' + feature.properties.black_per + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
-                var exhMarker = new L.Icon({
-                    iconSize: [50, 50],
-                    iconUrl: "img/exhibit.png",
-                    shadowSize: [80, 50]
-                });
-                layer.setIcon(exhMarker);
             }
-        }).addTo(mymap)
+        }).addTo(mymap);
     });
 };
 
-//filter family sites
-function filterFam() {
-    if (mymap.hasLayer(parkSites)) {
-        mymap.removeLayer(parkSites);
+function filterHisp() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
     };
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlFam, function (data) {
-        parkSites = L.geoJson(data, {
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusRaceStyleHisp,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.type + '</em></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Percent Hispanic: ' + '</b>' + feature.properties.hisp_per + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
-                var famMarker = new L.Icon({
-                    iconSize: [50, 50],
-                    iconUrl: "img/children.png",
-                    shadowSize: [80, 50]
-                });
-                layer.setIcon(famMarker);
             }
-        }).addTo(mymap)
+        }).addTo(mymap);
     });
 };
 
-//filter recreation sites
-function filterRec() {
-    if (mymap.hasLayer(parkSites)) {
-        mymap.removeLayer(parkSites);
+
+
+function filterAsia() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
     };
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlRec, function (data) {
-        parkSites = L.geoJson(data, {
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusRaceStyleAsian,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.type + '</em></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Percent Asian: ' + '</b>' + feature.properties.asian_per + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
-                var recMarker = new L.Icon({
-                    iconSize: [50, 50],
-                    iconUrl: "img/recicon.png",
-                    shadowSize: [80, 50]
-                });
-                layer.setIcon(recMarker);
             }
-        }).addTo(mymap)
+        }).addTo(mymap);
     });
 };
 
-//filter doggy areas
-function filterDog() {
-    if (mymap.hasLayer(parkSites)) {
-        mymap.removeLayer(parkSites);
+function filterOther() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
     };
-    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlDog, function (data) {
-        parkSites = L.geoJson(data, {
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusRaceStyleOther,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.type + '</em></p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Percent Other: ' + '</b>' + feature.properties.other_per + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
-                var dogMarker = new L.Icon({
-                    iconSize: [50, 50],
-                    iconUrl: "img/dog1600.png",
-                    shadowSize: [80, 50]
-                });
-                layer.setIcon(dogMarker);
             }
-        }).addTo(mymap)
+        }).addTo(mymap);
     });
-};*/
+};
+
+function filterMulti() {
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
+    };
+
+    $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
+        censusTracts = L.geoJson(data, {
+            style: censusRaceStyleMulti,
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup('<p><b>' + 'Census Tract ID: '+ '</b>' + feature.properties.tractce10 + '<br/><b>' + 'Percent Multiracial: ' + '</b>' + feature.properties.multi_per + '</p>');
+                layer.cartdodb_id = feature.properties.cartdodb_id;
+            }
+        }).addTo(mymap);
+    });
+};
+
+
 
 //create function for location based filtering
 function locationFound(e){
     myLocation = e.latlng;
-    closestSite();
-    locationMarker = L.marker(e.latlng, {icon: locateIcon});
-    mymap.addLayer(locationMarker);
 };
 
 function locationError(e){
@@ -280,30 +359,6 @@ function locationError(e){
 
 mymap.on('click', locationFound);
 
-//function utilizing location to filter nearest sites
-/*function closestSite(){
-    var sqlClosest = "SELECT * FROM park_sites ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint("+myLocation.lng+","+myLocation.lat+"), 4326) LIMIT 3";
-    
-    if (mymap.hasLayer(parkSites)){
-        mymap.removeLayer(parkSites);
-    };
-
-    if (mymap.hasLayer(locationMarker)){
-        mymap.removeLayer(locationMarker);
-    };
-
-    $.getJSON("https://"+cartoUser+".carto.com/api/v2/sql?format=GeoJSON&q="+sqlClosest, function(data){
-        parkSites = L.geoJson(data,{
-            onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.name + '</b><br /><em>' + feature.properties.type + '</em></p>');
-                layer.cartdodb_id = feature.properties.cartdodb_id;
-            }
-        }).addTo(mymap);
-
-    });
-
-};*/
-
 //event listeners
 //checkbox event listener for census tracts
 $('input[value=census').change(function () {
@@ -311,6 +366,14 @@ $('input[value=census').change(function () {
         showCensus();
     } else {
         mymap.removeLayer(censusTracts)
+    };
+});
+
+$('input[value=houseVal').change(function () {
+    if (this.checked) {
+        showHomeVal();
+    } else {
+        mymap.removeLayer(homeValues)
     };
 });
 
@@ -333,33 +396,36 @@ $('input[value=kirwan').change(function () {
 });
 
 //listener for housing
-$('input[value=housing').change(function () {
+$('input[value=sites').change(function () {
     if (this.checked) {
         showHouse();
     } else {
-        mymap.removeLayer(housing)
+        mymap.removeLayer(housingSites)
     };
 });
 ///////////////////////////////////////////////////////////////////////
 
 //listeners for point layers
-$('input[value=ent]').click(function () {
-    filterEnt();
+$('input[value=white]').click(function () {
+    filterWhite();
 });
-$('input[value=exh]').click(function () {
-    filterExh();
+$('input[value=black]').click(function () {
+    filterBlack();
 });
-$('input[value=fam]').click(function () {
-    filterFam();
+$('input[value=hispanic]').click(function () {
+    filterHisp();
 });
-$('input[value=rec]').click(function () {
-    filterRec();
+$('input[value=asian]').click(function () {
+    filterAsia();
 });
-$('input[value=dog]').click(function () {
-    filterDog();
+$('input[value=other]').click(function () {
+    filterOther();
 });
-$('input[value=all]').click(function () {
-    showSites();
+$('input[value=multi]').click(function () {
+    filterMulti();
+});
+$('input[value=pop]').click(function () {
+    showCensus();
 });
 
 //create map and load all park sites

@@ -4,26 +4,26 @@
 		
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
-		<link href="img/acl-favicon.png" rel="icon" type="image/x-icon" />
+		<link href="img/house.png" rel="icon" type="image/x-icon" />
 		<title>Keep Austin Affordable</title>
 	
 		<h1>Keep Austin Affordable?</h1>
 		<div id="check">
-			<input type="checkbox" name="census" value="census"> Census Tracts</input>
+			<input type="checkbox" name="houseVal" value="houseVal"> Home Values</input>
 			<input type="checkbox" name="undev" value="undev"> Undeveloped Land</input>
 			<input type="checkbox" name="kirwan" value="kirwan"> Kirwan Opportunity Index</input>
-			<input type="checkbox" name="housing" value="housing"> Affordable Housing Sites</input>
+			<input type="checkbox" name="sites" value="sites"> Affordable Housing Sites</input>
 		</div>
 
 		<!--Try to contain buttons in leaflet control menu-->
 		<div id="buttons">
-			<input type="radio" name="filter" value="pop" checked> Return to Census Tract by Population</input>
-			<input type="radio" name="filter" value="white"> Total White Population</input>
-			<input type="radio" name="filter" value="black"> Total Black Population</input>
-			<input type="radio" name="filter" value="hispanic"> Total Hispanic Population</input>
-			<input type="radio" name="filter" value="asian"> Total Asian Population</input>
-			<input type="radio" name="filter" value="other"> Total Other Population</input>
-			<input type="radio" name="filter" value="multi"> Total Multi-Racial Population</input>
+			<input type="checkbox" name="census" value="census"> Show Census Tracts</input>
+			<input type="radio" name="filter" value="white"> Percent White Population</input>
+			<input type="radio" name="filter" value="black"> Percent Black Population</input>
+			<input type="radio" name="filter" value="hispanic"> Percent Hispanic Population</input>
+			<input type="radio" name="filter" value="asian"> Percent Asian Population</input>
+			<input type="radio" name="filter" value="other"> Percent Other Population</input>
+			<input type="radio" name="filter" value="multi"> Percent Multi-Racial Population</input>
 		</div>
 	
 		<!--<div id="form">
