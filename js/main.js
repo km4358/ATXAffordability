@@ -221,7 +221,7 @@ function showHomeVal() {
     };
 
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlValues, function (data) {
-        kirwan = L.geoJson(data, {
+        homeValues = L.geoJson(data, {
             style: valStyle,
             onEachFeature: function (feature, layer) {
                 layer.bindPopup('<p><b>' + 'Census Tract ID: ' + '</b>' + feature.properties.tractce10 + '</br><b>' + 'Median Home Value: $' + '</b>' + feature.properties.median_val + '</p>');
