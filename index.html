@@ -9,6 +9,7 @@
 	
 		<h1>Keep Austin Affordable?</h1>
 		<div id="check">
+			<input type="checkbox" name="census" value="census"> Show Census Tracts</input>
 			<input type="checkbox" name="houseVal" value="houseVal"> Home Values</input>
 			<input type="checkbox" name="undev" value="undev"> Undeveloped Land</input>
 			<input type="checkbox" name="kirwan" value="kirwan"> Kirwan Opportunity Index</input>
@@ -17,14 +18,26 @@
 
 		<!--Try to contain buttons in leaflet control menu-->
 		<div id="buttons">
-			<input type="checkbox" name="census" value="census"> Show Census Tracts</input>
-			<input type="radio" name="filter" value="white"> Percent White Population</input>
-			<input type="radio" name="filter" value="black"> Percent Black Population</input>
-			<input type="radio" name="filter" value="hispanic"> Percent Hispanic Population</input>
-			<input type="radio" name="filter" value="asian"> Percent Asian Population</input>
-			<input type="radio" name="filter" value="other"> Percent Other Population</input>
-			<input type="radio" name="filter" value="multi"> Percent Multi-Racial Population</input>
+		
+			<div class="dropdown">
+				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Race per Census Tract (%) 
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<input type="radio" name="filter" value="white"> White </input>
+					<input type="radio" name="filter" value="black"> Black </input>
+					<input type="radio" name="filter" value="hispanic"> Hispanic </input>
+					<input type="radio" name="filter" value="asian"> Asian </input>
+					<input type="radio" name="filter" value="other"> Other </input>
+					<input type="radio" name="filter" value="multi"> Multi-Racial </input>
+		
+				</ul>
+		
+		
+			</div>
 		</div>
+
+		
 	
 		<!--<div id="form">
 			<p>Click on the map to find the three closest park sites!</p>
