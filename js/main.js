@@ -5,7 +5,7 @@
 var mymap = L.map('map').setView([30.275, -97.741], 12);
 //set tile layer source and attributes
 var tileLayer = L.tileLayer('https://api.mapbox.com/styles/v1/kmcalister/cjdrsckx62ok42spck7uq21t5/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia21jYWxpc3RlciIsImEiOiJjaXNkbW9lM20wMDZ1Mm52b3p3cDJ0NjE0In0.KyQ5znmrXLsxaPk6y-fn0A', {
-    attribution: 'Site Design © Kerry C. McAlister, 2018; Imagery: <a href="mapbox://styles/kmcalister/cjdrsckx62ok42spck7uq21t5">Mapbox</a>'
+    attribution: 'Site Design © Kerry C. McAlister, 2018; Data: <a href="https://data.austintexas.gov/browse?category=Locations+and+Maps">City of Austin</a>, <a href="https://factfinder.census.gov/faces/nav/jsf/pages/searchresults.xhtml?refresh=t#">US Census Bureau</a> Imagery: <a href="mapbox://styles/kmcalister/cjdrsckx62ok42spck7uq21t5">Mapbox</a>'
 });
 //add tile layer to map    
 tileLayer.addTo(mymap);

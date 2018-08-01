@@ -1,14 +1,14 @@
 /*Stylesheet by Kerry C. McAlister, 2018 */
 
 #map {
-    height: 100vh;
+    height: 100%;
     width: 100%;
     display: inline-block;
     align-items: center;
 }
 
 body, html {
-    height: 100vh;
+    height: 100%;
     background-color: #017a2f;
 }
 
