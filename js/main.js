@@ -31,14 +31,14 @@ var kirwan = null;
 var housingSites = null;
 
 //set location var 
-var myLocation = null;
+/*var myLocation = null;
 var locationMarker = null;
 
 //user location icon
 var locateIcon = L.icon({
     iconUrl: 'img/185719.svg',
     iconSize: [50, 50]
-});
+});*/
 
 //set styles for boundary and trails
 var censusStyle = {
@@ -162,7 +162,7 @@ function censusRaceStyleMulti(feature) {
 };
 
 //turn on location control
-L.control.locate({ icon: 'fa fa-location-arrow' }).addTo(mymap);
+//L.control.locate({ icon: 'fa fa-location-arrow' }).addTo(mymap);
 
 
 //function to load census tracts from geojson
