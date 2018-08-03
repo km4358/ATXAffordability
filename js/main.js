@@ -224,7 +224,7 @@ function showHomeVal() {
         homeValues = L.geoJson(data, {
             style: valStyle,
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + 'Census Tract ID: ' + '</b>' + feature.properties.tractce10 + '</br><b>' + 'Median Home Value: $' + '</b>' + feature.properties.median_val + '</p>');
+                layer.bindPopup('<p><b>' + 'Census Tract ID: ' + '</b>' + feature.properties.tractce10 + '</br><b>' + 'Median Home Value:'+'</b>'+ ' $' + feature.properties.median_val + '</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
