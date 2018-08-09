@@ -239,7 +239,7 @@ function showHouse() {
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlHouseSites, function (data) {
         housingSites = L.geoJson(data, {
             onEachFeature: function (feature, layer) {
-                layer.bindPopup('<p><b>' + feature.properties.project_name + '</b></p>');
+                layer.bindPopup('<p><b>' + feature.properties.project_na + '</br></b>' + "<a href='" + feature.properties.website + "'>" + feature.properties.website + "</a>"+'</p>');
                 layer.cartdodb_id = feature.properties.cartdodb_id;
             }
         }).addTo(mymap);
@@ -428,6 +428,6 @@ $('input[value=pop]').click(function () {
     showCensus();
 });
 
-//create map and load all park sites
+//create map 
 $(document).ready(function () {
 });
