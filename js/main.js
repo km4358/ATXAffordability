@@ -30,17 +30,7 @@ var undeveloped = null;
 var kirwan = null;
 var housingSites = null;
 
-//set location var 
-/*var myLocation = null;
-var locationMarker = null;
-
-//user location icon
-var locateIcon = L.icon({
-    iconUrl: 'img/185719.svg',
-    iconSize: [50, 50]
-});*/
-
-//set styles for boundary and trails
+//set styles
 var censusStyle = {
     "color": "#dc42f4",
     "weight": 2,
@@ -54,6 +44,7 @@ var landStyle = {
     "opacity": 0.75
 };
 
+//set color values
 function getOppColor(d){
     return d == 'Very High' ? '#003813' :
     d == 'High'  ? '#00822c' :
@@ -161,10 +152,6 @@ function censusRaceStyleMulti(feature) {
 
 };
 
-//turn on location control
-//L.control.locate({ icon: 'fa fa-location-arrow' }).addTo(mymap);
-
-
 //function to load census tracts from geojson
 function showCensus() {
     if (mymap.hasLayer(censusTracts)) {
@@ -199,6 +186,7 @@ function showUndev() {
     });
 };
 
+//load opportunity data
 function showKir() {
     if (mymap.hasLayer(kirwan)) {
         mymap.removeLayer(kirwan);
@@ -215,6 +203,7 @@ function showKir() {
     });
 };
 
+//load home values 
 function showHomeVal() {
     if (mymap.hasLayer(homeValues)) {
         mymap.removeLayer(homeValues);
@@ -231,6 +220,7 @@ function showHomeVal() {
     });
 };
 
+//load affordable housing sites
 function showHouse() {
     if (mymap.hasLayer(housingSites)) {
         mymap.removeLayer(housingSites);
@@ -247,7 +237,7 @@ function showHouse() {
 };
 
 
-//filter entertainment sites
+//filter race percentages
 function filterWhite() {
     if (mymap.hasLayer(censusTracts)) {
         mymap.removeLayer(censusTracts);
@@ -296,8 +286,6 @@ function filterHisp() {
     });
 };
 
-
-
 function filterAsia() {
     if (mymap.hasLayer(censusTracts)) {
         mymap.removeLayer(censusTracts);
@@ -345,19 +333,6 @@ function filterMulti() {
         }).addTo(mymap);
     });
 };
-
-
-
-//create function for location based filtering
-function locationFound(e){
-    myLocation = e.latlng;
-};
-
-function locationError(e){
-    alert(e.message);
-};
-
-mymap.on('click', locationFound);
 
 //event listeners
 //checkbox event listener for census tracts
