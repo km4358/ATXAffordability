@@ -149,6 +149,10 @@ h1{
     width: 200px; 
 }
 
+.legend{
+    box-shadow: 3px 3px #888888
+}
+
 .legend-control-container{
     width: auto;
     height: max-content ;

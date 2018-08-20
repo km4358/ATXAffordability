@@ -154,11 +154,25 @@ function censusRaceStyleMulti(feature) {
 
 };
 
+var censusLegend = L.control({position: 'topright'});
+
 //function to load census tracts from geojson
 function showCensus() {
     if (mymap.hasLayer(censusTracts)) {
         mymap.removeLayer(censusTracts);
     };
+
+    if (mymap.hasLayer(censusLegend)) {
+        mymap.removeLayer(censusLegend);
+    };
+
+    censusLegend.onAdd = function (mymap) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML +=
+        '<img src="img/census.png" alt="legend" width="165.5" height="52.5">';
+        return div;
+    };
+    censusLegend.addTo(mymap);
 
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
         censusTracts = L.geoJson(data, {
@@ -342,7 +356,8 @@ $('input[value=census').change(function () {
     if (this.checked) {
         showCensus();
     } else {
-        mymap.removeLayer(censusTracts)
+        mymap.removeLayer(censusTracts);
+        mymap.removeControl(censusLegend)
     };
 });
 
