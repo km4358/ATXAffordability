@@ -32,9 +32,11 @@ var housingSites = null;
 
 //set styles
 var censusStyle = {
-    "color": "#dc42f4",
-    "weight": 2,
-    "opacity": 1
+    fillColor: "white",
+    color: "#dc42f4",
+    "weight": 1.5,
+    "opacity": 1,
+    "fillOpacity":0
 };
 
 var landStyle = {
