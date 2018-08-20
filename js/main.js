@@ -2,7 +2,7 @@
 
 
 //set map variable and view
-var mymap = L.map('map').setView([30.275, -97.741], 12);
+var mymap = L.map('map').setView([30.275, -97.741], 10);
 //set tile layer source and attributes
 var tileLayer = L.tileLayer('https://api.mapbox.com/styles/v1/kmcalister/cjdrsckx62ok42spck7uq21t5/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia21jYWxpc3RlciIsImEiOiJjaXNkbW9lM20wMDZ1Mm52b3p3cDJ0NjE0In0.KyQ5znmrXLsxaPk6y-fn0A', {
     attribution: 'Site Design © Kerry C. McAlister, 2018; Data: <a href="https://data.austintexas.gov/browse?category=Locations+and+Maps">City of Austin</a>, <a href="https://factfinder.census.gov/faces/nav/jsf/pages/searchresults.xhtml?refresh=t#">US Census Bureau</a> Imagery: <a href="mapbox://styles/kmcalister/cjdrsckx62ok42spck7uq21t5">Mapbox</a>'
@@ -34,7 +34,7 @@ var housingSites = null;
 var censusStyle = {
     "color": "#dc42f4",
     "weight": 2,
-    "opacity": 0.75
+    "opacity": 0.25
 };
 
 var landStyle = {
@@ -158,6 +158,14 @@ function showCensus() {
         mymap.removeLayer(censusTracts);
     };
 
+    if (mymap.hasLayer(kirwan)) {
+        mymap.removeLayer(kirwan);
+    };
+
+    if (mymap.hasLayer(homeValues)) {
+        mymap.removeLayer(homeValues);
+    };
+
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
         censusTracts = L.geoJson(data, {
             style: censusStyle,
@@ -192,6 +200,14 @@ function showKir() {
         mymap.removeLayer(kirwan);
     };
 
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
+    };
+
+    if (mymap.hasLayer(homeValues)) {
+        mymap.removeLayer(homeValues);
+    };
+
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlKirwan, function (data) {
         kirwan = L.geoJson(data, {
             style: oppStyle,
@@ -205,6 +221,14 @@ function showKir() {
 
 //load home values 
 function showHomeVal() {
+    if (mymap.hasLayer(kirwan)) {
+        mymap.removeLayer(kirwan);
+    };
+
+    if (mymap.hasLayer(censusTracts)) {
+        mymap.removeLayer(censusTracts);
+    };
+
     if (mymap.hasLayer(homeValues)) {
         mymap.removeLayer(homeValues);
     };
@@ -336,20 +360,12 @@ function filterMulti() {
 
 //event listeners
 //checkbox event listener for census tracts
-$('input[value=census').change(function () {
-    if (this.checked) {
-        showCensus();
-    } else {
-        mymap.removeLayer(censusTracts)
-    };
+$('input[value=census').click(function () {
+    showCensus();
 });
 
-$('input[value=houseVal').change(function () {
-    if (this.checked) {
-        showHomeVal();
-    } else {
-        mymap.removeLayer(homeValues)
-    };
+$('input[value=houseVal').click(function () {
+    showHomeVal();
 });
 
 //listener for land
@@ -362,12 +378,8 @@ $('input[value=undev').change(function () {
 });
 
 //listener for kirwan
-$('input[value=kirwan').change(function () {
-    if (this.checked) {
-        showKir();
-    } else {
-        mymap.removeLayer(kirwan)
-    };
+$('input[value=kirwan').click(function () {
+    showKir();
 });
 
 //listener for housing
