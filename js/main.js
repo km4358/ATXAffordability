@@ -34,7 +34,7 @@ var housingSites = null;
 var censusStyle = {
     "color": "#dc42f4",
     "weight": 2,
-    "opacity": 0.25
+    "opacity": 1
 };
 
 var landStyle = {
@@ -158,14 +158,6 @@ function showCensus() {
         mymap.removeLayer(censusTracts);
     };
 
-    if (mymap.hasLayer(kirwan)) {
-        mymap.removeLayer(kirwan);
-    };
-
-    if (mymap.hasLayer(homeValues)) {
-        mymap.removeLayer(homeValues);
-    };
-
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlCensus, function (data) {
         censusTracts = L.geoJson(data, {
             style: censusStyle,
@@ -200,14 +192,6 @@ function showKir() {
         mymap.removeLayer(kirwan);
     };
 
-    if (mymap.hasLayer(censusTracts)) {
-        mymap.removeLayer(censusTracts);
-    };
-
-    if (mymap.hasLayer(homeValues)) {
-        mymap.removeLayer(homeValues);
-    };
-
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlKirwan, function (data) {
         kirwan = L.geoJson(data, {
             style: oppStyle,
@@ -221,14 +205,6 @@ function showKir() {
 
 //load home values 
 function showHomeVal() {
-    if (mymap.hasLayer(kirwan)) {
-        mymap.removeLayer(kirwan);
-    };
-
-    if (mymap.hasLayer(censusTracts)) {
-        mymap.removeLayer(censusTracts);
-    };
-
     if (mymap.hasLayer(homeValues)) {
         mymap.removeLayer(homeValues);
     };
@@ -360,12 +336,20 @@ function filterMulti() {
 
 //event listeners
 //checkbox event listener for census tracts
-$('input[value=census').click(function () {
-    showCensus();
+$('input[value=census').change(function () {
+    if (this.checked) {
+        showCensus();
+    } else {
+        mymap.removeLayer(censusTracts)
+    };
 });
 
-$('input[value=houseVal').click(function () {
-    showHomeVal();
+$('input[value=houseVal').change(function () {
+    if (this.checked) {
+        showHomeVal();
+    } else {
+        mymap.removeLayer(homeValues)
+    };
 });
 
 //listener for land
@@ -378,8 +362,12 @@ $('input[value=undev').change(function () {
 });
 
 //listener for kirwan
-$('input[value=kirwan').click(function () {
-    showKir();
+$('input[value=kirwan').change(function () {
+    if (this.checked) {
+        showKir();
+    } else {
+        mymap.removeLayer(kirwan)
+    };
 });
 
 //listener for housing
