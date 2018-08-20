@@ -62,7 +62,8 @@ function getValColor(d){
     d > 500000  ? '#00822c' :
     d > 250000  ? '#97ef00' :
     d > 100000  ? '#ef8b00' :
-    d > 50000  ? '#ef0000':
+    d > 50000  ? '#c44901':
+    d > 1  ? '#ef0000':
     '#FFEDA0';
 
 };
@@ -89,8 +90,8 @@ function getCensusColor(d){
     return d > 75  ? '#BD0026' :
            d > 50  ? '#E31A1C' :
            d > 25   ? '#FD8D3C' :
-           d > 1   ? '#FED976' :
-                      '#FFEDA0';
+           d > 0   ? '#FED976' :
+                      '#fffff';
 
 };
 
@@ -155,6 +156,9 @@ function censusRaceStyleMulti(feature) {
 };
 
 var censusLegend = L.control({position: 'topright'});
+var valLegend = L.control({position: 'topright'});
+var kirLegend = L.control({position: 'topright'});
+
 
 //function to load census tracts from geojson
 function showCensus() {
@@ -208,6 +212,18 @@ function showKir() {
         mymap.removeLayer(kirwan);
     };
 
+    if (mymap.hasLayer(kirLegend)) {
+        mymap.removeLayer(kirLegend);
+    };
+
+    kirLegend.onAdd = function (mymap) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML +=
+        '<img src="img/kirwan.png" alt="legend" width="180" height="207.5">';
+        return div;
+    };
+    kirLegend.addTo(mymap);
+
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlKirwan, function (data) {
         kirwan = L.geoJson(data, {
             style: oppStyle,
@@ -224,6 +240,18 @@ function showHomeVal() {
     if (mymap.hasLayer(homeValues)) {
         mymap.removeLayer(homeValues);
     };
+
+    if (mymap.hasLayer(valLegend)) {
+        mymap.removeLayer(valLegend);
+    };
+
+    valLegend.onAdd = function (mymap) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML +=
+        '<img src="img/values.png" alt="legend" width="180" height="207.5">';
+        return div;
+    };
+    valLegend.addTo(mymap);
 
     $.getJSON("https://" + cartoUser + ".carto.com/api/v2/sql?format=GeoJSON&q=" + sqlValues, function (data) {
         homeValues = L.geoJson(data, {
@@ -365,7 +393,8 @@ $('input[value=houseVal').change(function () {
     if (this.checked) {
         showHomeVal();
     } else {
-        mymap.removeLayer(homeValues)
+        mymap.removeLayer(homeValues);
+        mymap.removeControl(valLegend)
     };
 });
 
@@ -383,7 +412,8 @@ $('input[value=kirwan').change(function () {
     if (this.checked) {
         showKir();
     } else {
-        mymap.removeLayer(kirwan)
+        mymap.removeLayer(kirwan);
+        mymap.removeControl(kirLegend)
     };
 });
 
