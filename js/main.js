@@ -95,6 +95,7 @@ function getCensusColor(d){
 
 };
 
+//apply color scales to attributes
 function censusRaceStyleWhite(feature) {
     return{
         fillColor: getCensusColor(feature.properties.white_per),
@@ -155,6 +156,7 @@ function censusRaceStyleMulti(feature) {
 
 };
 
+//create legend containers
 var censusLegend = L.control({position: 'topright'});
 var valLegend = L.control({position: 'topright'});
 var kirLegend = L.control({position: 'topright'});
@@ -170,7 +172,7 @@ function showCensus() {
         mymap.removeLayer(censusLegend);
     };
 
-    censusLegend.onAdd = function (mymap) {
+    censusLegend.onAdd = function () {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML +=
         '<img src="img/census.png" alt="legend" width="165.5" height="52.5">';
@@ -216,7 +218,7 @@ function showKir() {
         mymap.removeLayer(kirLegend);
     };
 
-    kirLegend.onAdd = function (mymap) {
+    kirLegend.onAdd = function () {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML +=
         '<img src="img/kirwan.png" alt="legend" width="180" height="207.5">';
@@ -245,7 +247,7 @@ function showHomeVal() {
         mymap.removeLayer(valLegend);
     };
 
-    valLegend.onAdd = function (mymap) {
+    valLegend.onAdd = function () {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML +=
         '<img src="img/values.png" alt="legend" width="180" height="207.5">';
@@ -385,7 +387,7 @@ $('input[value=census').change(function () {
         showCensus();
     } else {
         mymap.removeLayer(censusTracts);
-        mymap.removeControl(censusLegend)
+        mymap.removeControl(censusLegend);
     };
 });
 
@@ -394,7 +396,7 @@ $('input[value=houseVal').change(function () {
         showHomeVal();
     } else {
         mymap.removeLayer(homeValues);
-        mymap.removeControl(valLegend)
+        mymap.removeControl(valLegend);
     };
 });
 
@@ -403,7 +405,7 @@ $('input[value=undev').change(function () {
     if (this.checked) {
         showUndev();
     } else {
-        mymap.removeLayer(undeveloped)
+        mymap.removeLayer(undeveloped);
     };
 });
 
@@ -413,7 +415,7 @@ $('input[value=kirwan').change(function () {
         showKir();
     } else {
         mymap.removeLayer(kirwan);
-        mymap.removeControl(kirLegend)
+        mymap.removeControl(kirLegend);
     };
 });
 
@@ -422,7 +424,7 @@ $('input[value=sites').change(function () {
     if (this.checked) {
         showHouse();
     } else {
-        mymap.removeLayer(housingSites)
+        mymap.removeLayer(housingSites);
     };
 });
 ///////////////////////////////////////////////////////////////////////
