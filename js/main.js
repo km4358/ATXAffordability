@@ -175,7 +175,7 @@ function showCensus() {
     censusLegend.onAdd = function () {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML +=
-        '<img src="img/census.png" alt="legend" width="165.5" height="52.5">';
+        '<img src="img/census.PNG" alt="legend" width="165.5" height="52.5">';
         return div;
     };
     censusLegend.addTo(mymap);
@@ -221,7 +221,7 @@ function showKir() {
     kirLegend.onAdd = function () {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML +=
-        '<img src="img/kirwan.png" alt="legend" width="180" height="207.5">';
+        '<img src="img/kirwan.PNG" alt="legend" width="180" height="207.5">';
         return div;
     };
     kirLegend.addTo(mymap);
@@ -250,7 +250,7 @@ function showHomeVal() {
     valLegend.onAdd = function () {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML +=
-        '<img src="img/values.png" alt="legend" width="180" height="207.5">';
+        '<img src="img/values.PNG" alt="legend" width="180" height="207.5">';
         return div;
     };
     valLegend.addTo(mymap);
